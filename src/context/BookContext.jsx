@@ -24,12 +24,14 @@ export const BookProvider = ({ children }) => {
     } catch (error) {
       console.error("Error fetching books:", error);
     }
-  }, []);
+  }, []); // The empty dependency array let us know the function is created only once
 
+   // Use useEffect to fetch books when the component mounts
   useEffect(() => {
     fetchBooks();
-  }, [fetchBooks]);
+  }, [fetchBooks]); // Depend on fetchBooks so it re-runs if fetchBooks changes
 
+  // Providing the books data and fetchBooks function to child components
   return (
     <BookContext.Provider value={{ books, fetchBooks }}>
       {children}
@@ -37,4 +39,5 @@ export const BookProvider = ({ children }) => {
   );
 };
 
+// Again using Custom hook to use the BookContext easily in other components
 export const useBook = () => useContext(BookContext);
