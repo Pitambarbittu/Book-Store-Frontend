@@ -197,6 +197,9 @@ const BookForm = () => {
           <Nav className="ml-auto">
             <Nav.Link href="/login">Login</Nav.Link>
             <Nav.Link href="/">Register</Nav.Link>
+            <Button onClick={handleLogout} variant="danger" className="ml-2">
+              Logout
+            </Button>
           </Nav>
         </Container>
       </Navbar>
@@ -296,13 +299,13 @@ const BookForm = () => {
           </Table>
         </Col>
       </Row>
-      <Button
+      {/* <Button
         onClick={handleLogout}
         variant="danger"
         className="position-fixed bottom-0 end-0 m-3"
       >
         Logout
-      </Button>
+      </Button> */}
     </Container>
   );
 };
