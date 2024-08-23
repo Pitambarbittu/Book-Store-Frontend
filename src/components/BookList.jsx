@@ -16,6 +16,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URI;
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
+  const [bookToUpdate, setBookToUpdate] = useState(null);
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
@@ -88,6 +89,11 @@ const BookList = () => {
       setMessage("Failed to delete book. Please try again.");
       setError(true);
     }
+  };
+
+  const handleUpdate = (book) => {
+    setBookToUpdate(book);
+    navigate(`/update-book/${book._id}`);
   };
 
   const handleLogout = async () => {
@@ -163,7 +169,16 @@ const BookList = () => {
                     <td>{book.gender}</td>
                     <td>
                       <Button
+                        variant="info"
+                        // className="mr-4"
+                        style={{ marginRight: "15px" }}
+                        onClick={() => handleUpdate(book)}
+                      >
+                        Update
+                      </Button>
+                      <Button
                         variant="danger"
+                        className="mr-2"
                         onClick={() => handleDelete(book._id)}
                       >
                         Delete
