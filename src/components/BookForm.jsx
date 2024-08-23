@@ -46,14 +46,12 @@ const BookForm = () => {
         });
 
         if (response.data.success) {
-          // Filter books by user ID
           const userBooks = response.data.data.filter(
             (book) => book.userId === userId
           );
           setBooks(userBooks);
         } else {
           setError(response.data.msg);
-          setTimeout(() => setError(""), 2000);
         }
       } catch (err) {
         console.error("Error fetching books:", err);
@@ -65,6 +63,13 @@ const BookForm = () => {
 
     fetchBooks();
   }, [navigate]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(""), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
