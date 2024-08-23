@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Table, Alert, Button, Container, Row, Col } from "react-bootstrap";
+import {
+  Table,
+  Alert,
+  Button,
+  Container,
+  Row,
+  Col,
+  Navbar,
+  Nav,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+
 const API_URL = process.env.REACT_APP_BACKEND_URI;
 
 const BookList = () => {
@@ -80,8 +90,48 @@ const BookList = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      await axios.post(
+        `${API_URL}/api/v1/auth/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      localStorage.removeItem("token");
+      navigate("/login");
+    } catch (err) {
+      console.error("Error logging out:", err);
+      setMessage("Failed to log out. Please try again.");
+      setError(true);
+    }
+  };
+
   return (
     <Container fluid className="bg-dark text-white min-vh-100 py-5">
+      <Navbar bg="dark" variant="dark" className="mb-4">
+        <Container>
+          <Navbar.Brand href="#">Book Store</Navbar.Brand>
+          <Nav className="ml-auto">
+            <Nav.Link href="/login">Login</Nav.Link>
+            <Nav.Link href="/">Register</Nav.Link>
+            <Button onClick={handleLogout} variant="danger" className="ml-2">
+              Logout
+            </Button>
+          </Nav>
+        </Container>
+      </Navbar>
       <Row className="justify-content-center">
         <Col md={10} lg={8}>
           <div className="d-flex justify-content-between align-items-center mb-4">

@@ -162,11 +162,15 @@ const BookForm = () => {
         return;
       }
 
-      await axios.post(`${API_URL}/api/v1/auth/logout`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.post(
+        `${API_URL}/api/v1/auth/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       localStorage.removeItem("token");
       navigate("/login");
