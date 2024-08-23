@@ -53,6 +53,7 @@ const BookForm = () => {
           setBooks(userBooks);
         } else {
           setError(response.data.msg);
+          setTimeout(() => setError(""), 2000);
         }
       } catch (err) {
         console.error("Error fetching books:", err);
