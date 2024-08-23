@@ -147,6 +147,30 @@ const BookForm = () => {
     navigate("/all-books");
   };
 
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      await axios.post(`${API_URL}/api/v1/auth/logout`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      localStorage.removeItem("token");
+      navigate("/login");
+    } catch (err) {
+      console.error("Error logging out:", err);
+      setMessage("Failed to log out. Please try again.");
+      setError(true);
+    }
+  };
+
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100 bg-dark">
@@ -262,6 +286,13 @@ const BookForm = () => {
           </Table>
         </Col>
       </Row>
+      <Button
+        onClick={handleLogout}
+        variant="danger"
+        className="position-fixed bottom-0 end-0 m-3"
+      >
+        Logout
+      </Button>
     </Container>
   );
 };
