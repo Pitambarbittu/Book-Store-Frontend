@@ -20,7 +20,6 @@ const BookForm = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [gender, setGender] = useState("");
-  const [bookToUpdate, setBookToUpdate] = useState(null);
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
@@ -117,54 +116,6 @@ const BookForm = () => {
     }
   };
 
-  const handleUpdate = async () => {
-    if (!bookToUpdate) return;
-
-    try {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        setMessage("Unauthorized. Please log in.");
-        setError(true);
-        return;
-      }
-
-      const response = await axios.put(
-        `${API_URL}/api/v1/books/${bookToUpdate._id}`,
-        { title, author },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.data.success) {
-        setBooks((prevBooks) =>
-          prevBooks.map((book) =>
-            book._id === bookToUpdate._id
-              ? { ...book, title, author }
-              : book
-          )
-        );
-        setBookToUpdate(null);
-        setTitle("");
-        setAuthor("");
-        setSuccess(true);
-        setMessage("Book updated successfully!");
-        setTimeout(() => setMessage(""), 2000);
-      } else {
-        setSuccess(false);
-        setMessage(response.data.msg);
-      }
-    } catch (err) {
-      console.error("Error updating book:", err);
-      setSuccess(false);
-      setMessage("Failed to update book. Please try again.");
-      setError(true);
-    }
-  };
-
   const handleDelete = async (id) => {
     const token = localStorage.getItem("token");
 
@@ -254,21 +205,13 @@ const BookForm = () => {
       </Navbar>
       <Row className="justify-content-center">
         <Col md={8} lg={6}>
-          <h2 className="text-center mb-4">
-            {bookToUpdate ? "Update Book" : "Add a New Book"}
-          </h2>
+          <h2 className="text-center mb-4">Add a New Book</h2>
           {message && (
             <Alert variant={success ? "success" : "danger"} className="mb-4">
               {message}
             </Alert>
           )}
-          <Form
-            onSubmit={bookToUpdate ? (e) => {
-              e.preventDefault();
-              handleUpdate();
-            } : handleSubmit}
-            className="mt-4"
-          >
+          <Form onSubmit={handleSubmit} className="mt-4">
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
               <Form.Control
@@ -279,7 +222,7 @@ const BookForm = () => {
                 required
               />
             </Form.Group>
-  
+
             <Form.Group className="mb-3">
               <Form.Label>Author</Form.Label>
               <Form.Control
@@ -290,7 +233,7 @@ const BookForm = () => {
                 required
               />
             </Form.Group>
-  
+
             <Form.Group className="mb-3">
               <Form.Label>Gender</Form.Label>
               <Form.Control
@@ -299,7 +242,6 @@ const BookForm = () => {
                 onChange={(e) => setGender(e.target.value)}
                 className="form-select"
                 required
-                disabled={bookToUpdate} // Disable gender selection when updating
               >
                 <option value="">Select gender</option>
                 <option value="Male">Male</option>
@@ -307,69 +249,42 @@ const BookForm = () => {
                 <option value="Other">Other</option>
               </Form.Control>
             </Form.Group>
-  
+
             <div className="d-flex justify-content-between">
               <Button variant="primary" type="submit">
-                {bookToUpdate ? "Update Book" : "Add Book"}
+                Add Book
               </Button>
-              {bookToUpdate && (
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setBookToUpdate(null);
-                    setTitle("");
-                    setAuthor("");
-                    setGender("");
-                  }}
-                >
-                  Cancel Update
-                </Button>
-              )}
+              <Button onClick={handleViewAllBooks} variant="secondary">
+                View All Books
+              </Button>
             </div>
           </Form>
-          <Button
-            variant="secondary"
-            className="mt-4"
-            onClick={handleViewAllBooks}
-          >
-            View All Books
-          </Button>
-        </Col>
-      </Row>
-  
-      <Row className="justify-content-center mt-5">
-        <Col md={8} lg={6}>
-          <h3 className="text-center mb-4">Your Books</h3>
-          {books.length > 0 ? (
-            <Table striped bordered hover variant="dark">
-              <thead>
+
+          <h3 className="mt-5">Books List</h3>
+          {error && <Alert variant="danger">{error}</Alert>}
+          <Table striped bordered hover variant="dark" className="mt-3">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Gender</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {books.length === 0 ? (
                 <tr>
-                  <th>Title</th>
-                  <th>Author</th>
-                  <th>Gender</th>
-                  <th>Actions</th>
+                  <td colSpan="4" className="text-center">
+                    No books available
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {books.map((book) => (
+              ) : (
+                books.map((book) => (
                   <tr key={book._id}>
                     <td>{book.title}</td>
                     <td>{book.author}</td>
                     <td>{book.gender}</td>
                     <td>
-                      <Button
-                        variant="info"
-                        // className="mr-2"
-                        style={{ marginRight: "15px" }}
-                        onClick={() => {
-                          setBookToUpdate(book);
-                          setTitle(book.title);
-                          setAuthor(book.author);
-                          setGender(book.gender);
-                        }}
-                      >
-                        Update
-                      </Button>
                       <Button
                         variant="danger"
                         onClick={() => handleDelete(book._id)}
@@ -378,14 +293,19 @@ const BookForm = () => {
                       </Button>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </Table>
-          ) : (
-            <p className="text-center">No books found. Add a new book!</p>
-          )}
+                ))
+              )}
+            </tbody>
+          </Table>
         </Col>
       </Row>
+      {/* <Button
+        onClick={handleLogout}
+        variant="danger"
+        className="position-fixed bottom-0 end-0 m-3"
+      >
+        Logout
+      </Button> */}
     </Container>
   );
 };

@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Container, Form, Button, Row, Col } from "react-bootstrap";
+import { Container, Form, Button, Row, Col, Alert } from "react-bootstrap";
+
 const API_URL = process.env.REACT_APP_BACKEND_URI;
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -15,7 +17,11 @@ const RegisterPage = () => {
       await axios.post(`${API_URL}/api/v1/auth/register`, { email, password });
       navigate("/login");
     } catch (error) {
-      console.error("Error registering:", error);
+      if (error.response && error.response.data && error.response.data.message) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage("user alredy exist, try with different email id");
+      }
     }
   };
 
@@ -29,6 +35,11 @@ const RegisterPage = () => {
         <Col md={6} lg={4} className="mx-auto">
           <h2 className="text-center mb-4">Register</h2>
           <Form onSubmit={handleSubmit} className="bg-secondary p-4 rounded">
+            {errorMessage && (
+              <Alert variant="danger" className="mb-3">
+                {errorMessage}
+              </Alert>
+            )}
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control
