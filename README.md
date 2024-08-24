@@ -5,6 +5,7 @@ _"react": "^18.3.1"_
 
 ## Installation
 git clone with HTTPS - https://github.com/Pitambarbittu/Book-Store-Frontend.git
+
 git clone with SSH - git@github.com:Pitambarbittu/Book-Store-Frontend.git
 
 ## Install dependencies
