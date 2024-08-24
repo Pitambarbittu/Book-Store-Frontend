@@ -34,4 +34,4 @@ dependencies
 ## Axios is used for handling API requests to the backend server. The API base URL is configured using environment variables.
 
 # Application Hosted on vercel.com 
-- To access the hosted application, please click [click here](https://book-store-frontend-neon.vercel.app)
+- To access the hosted application, please [click here](https://book-store-frontend-neon.vercel.app)
