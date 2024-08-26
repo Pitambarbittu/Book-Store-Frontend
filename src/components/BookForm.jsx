@@ -26,6 +26,7 @@ const BookForm = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null); // State to track which book is being deleted
+  const [loggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -162,6 +163,7 @@ const BookForm = () => {
   };
 
   const handleLogout = async () => {
+    setLoggingOut(true);
     try {
       const token = localStorage.getItem("token");
 
@@ -186,6 +188,8 @@ const BookForm = () => {
       console.error("Error logging out:", err);
       setMessage("Failed to log out. Please try again.");
       setError(true);
+    } finally {
+      setLoggingOut(false)
     }
   };
 
@@ -215,7 +219,7 @@ const BookForm = () => {
               onClick={handleLogout}
               variant="danger"
               className="ml-2"
-              disabled={!!loading} // Disable button if logging out
+              disabled={loggingOut} // Disable button if logging out
             >
               {loading ? "Logging out..." : "Logout"}
             </Button>
