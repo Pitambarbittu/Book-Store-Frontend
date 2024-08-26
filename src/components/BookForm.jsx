@@ -77,9 +77,19 @@ const BookForm = () => {
     try {
       const token = localStorage.getItem("token");
 
+      // if (!token) {
+      //   setMessage("Unauthorized. Please log in again.");
+      //   setError(true);
+      //   return;
+      // }
+
       if (!token) {
-        setMessage("Unauthorized. Please log in.");
+        setMessage("Unauthorized. Please log in again.");
         setError(true);
+        setTimeout(() => {
+          localStorage.removeItem("token");
+          navigate("/login");
+        }, 1000); // Refresh after 1 second and redirecting to the login page
         return;
       }
 
