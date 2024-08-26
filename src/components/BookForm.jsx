@@ -183,8 +183,14 @@ const BookForm = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100 bg-dark">
+      <div
+        style={{ gap: "10px" }}
+        className="d-flex justify-content-center align-items-center min-vh-100 bg-dark text-white"
+      >
         <Spinner animation="border" variant="primary" />
+        <p className="ml-3" style={{ margin: "0px" }}>
+          Loading Book Store ...
+        </p>
       </div>
     );
   }
@@ -299,13 +305,6 @@ const BookForm = () => {
           </Table>
         </Col>
       </Row>
-      {/* <Button
-        onClick={handleLogout}
-        variant="danger"
-        className="position-fixed bottom-0 end-0 m-3"
-      >
-        Logout
-      </Button> */}
     </Container>
   );
 };

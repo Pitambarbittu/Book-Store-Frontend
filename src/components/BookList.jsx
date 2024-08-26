@@ -9,6 +9,7 @@ import {
   Col,
   Navbar,
   Nav,
+  Spinner,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -19,41 +20,46 @@ const BookList = () => {
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const token = localStorage.getItem("token");
+  const fetchBooks = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
 
-        if (!token) {
-          setMessage("Unauthorized. Please log in.");
-          setError(true);
-          return;
-        }
-
-        const response = await axios.get(`${API_URL}/api/v1/books`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.data.success) {
-          setBooks(response.data.data);
-          setSuccess(true);
-          setMessage("");
-        } else {
-          setSuccess(false);
-          setMessage(response.data.msg);
-        }
-      } catch (err) {
-        console.error("Error fetching books:", err);
-        setSuccess(false);
-        setMessage("Failed to fetch books. Please try again.");
+      if (!token) {
+        setMessage("Unauthorized. Please log in.");
         setError(true);
+        setLoading(false);
+        return;
       }
-    };
 
+      const response = await axios.get(`${API_URL}/api/v1/books`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.success) {
+        setBooks(response.data.data);
+        setSuccess(true);
+        setMessage("");
+      } else {
+        setSuccess(false);
+        setMessage(response.data.msg);
+      }
+    } catch (err) {
+      console.error("Error fetching books:", err);
+      setSuccess(false);
+      setMessage("Failed to fetch books. Please try again.");
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchBooks();
   }, []);
 
@@ -118,6 +124,11 @@ const BookList = () => {
     }
   };
 
+  const handleBack = () => {
+    fetchBooks();
+    navigate("/books");
+  };
+
   return (
     <Container fluid className="bg-dark text-white min-vh-100 py-5">
       <Navbar bg="dark" variant="dark" className="mb-4">
@@ -135,7 +146,7 @@ const BookList = () => {
       <Row className="justify-content-center">
         <Col md={10} lg={8}>
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <Button variant="secondary" onClick={() => navigate("/books")}>
+            <Button variant="secondary" onClick={handleBack}>
               Back
             </Button>
             <h2 className="text-center">All Books</h2>
@@ -145,7 +156,12 @@ const BookList = () => {
               {message}
             </Alert>
           )}
-          {books.length > 0 ? (
+          {loading ? (
+            <div className="text-center">
+              <Spinner animation="border" variant="primary" />
+              <p>Loading books...</p>
+            </div>
+          ) : books.length > 0 ? (
             <Table striped bordered hover variant="dark">
               <thead>
                 <tr>

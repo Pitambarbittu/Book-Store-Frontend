@@ -2,26 +2,36 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-import { Form, Button, Alert, Container, Row, Col } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Alert,
+  Container,
+  Row,
+  Col,
+  Spinner,
+} from "react-bootstrap";
+
 const API_URL = process.env.REACT_APP_BACKEND_URI;
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("API_URL:", API_URL);
+    setLoading(true);
+    setError("");
 
     try {
       const response = await axios.post(`${API_URL}/api/v1/auth/login`, {
         email,
         password,
       });
-      console.log("API_URL:", API_URL);
 
       if (response.data.success) {
         login(response.data.token);
@@ -31,6 +41,8 @@ const LoginForm = () => {
       }
     } catch (err) {
       setError("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,13 +79,32 @@ const LoginForm = () => {
               />
             </Form.Group>
 
-            <Button variant="primary" type="submit" className="w-100 mb-2">
-              Login
+            <Button
+              variant="primary"
+              type="submit"
+              className="w-100 mb-2"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                  {" Loading..."}
+                </>
+              ) : (
+                "Login"
+              )}
             </Button>
             <Button
               variant="secondary"
               onClick={handleRegister}
               className="w-100"
+              disabled={loading}
             >
               Register
             </Button>
