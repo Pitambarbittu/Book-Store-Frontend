@@ -22,7 +22,7 @@ const BookList = () => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null); // State to track which book is being deleted
-  const [loggingOut, setLoggingOut] = useState(false); // State to track logging out status
+  const [loggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
 
   const fetchBooks = async () => {
@@ -35,7 +35,7 @@ const BookList = () => {
         setError(true);
         setTimeout(() => {
           localStorage.removeItem("token");
-          navigate("/login");
+          navigate("/");
         }, 1000); // Refresh after 1 second and redirect to the login page
         return;
       }
@@ -105,12 +105,12 @@ const BookList = () => {
   };
 
   const handleLogout = async () => {
-    setLoggingOut(true); // Set logging out status
+    setLoggingOut(true);
     try {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        navigate("/login");
+        navigate("/");
         return;
       }
 
@@ -125,13 +125,13 @@ const BookList = () => {
       );
 
       localStorage.removeItem("token");
-      navigate("/login");
+      navigate("/");
     } catch (err) {
       console.error("Error logging out:", err);
       setMessage("Failed to log out. Please try again.");
       setError(true);
     } finally {
-      setLoggingOut(false); // Reset logging out status
+      setLoggingOut(false);
     }
   };
 
@@ -146,8 +146,8 @@ const BookList = () => {
         <Container>
           <Navbar.Brand href="#">Book Store</Navbar.Brand>
           <Nav className="ml-auto">
-            <Nav.Link href="/login">Login</Nav.Link>
-            <Nav.Link href="/">Register</Nav.Link>
+            <Nav.Link href="/">Login</Nav.Link>
+            <Nav.Link href="/register">Register</Nav.Link>
             <Button
               onClick={handleLogout}
               variant="danger"

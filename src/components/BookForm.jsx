@@ -34,7 +34,7 @@ const BookForm = () => {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        navigate("/login");
+        navigate("/");
         return;
       }
 
@@ -84,7 +84,7 @@ const BookForm = () => {
         setError(true);
         setTimeout(() => {
           localStorage.removeItem("token");
-          navigate("/login");
+          navigate("/");
         }, 1000); // Refresh after 1 second and redirecting to the login page
         return;
       }
@@ -168,7 +168,7 @@ const BookForm = () => {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        navigate("/login");
+        navigate("/");
         return;
       }
 
@@ -183,7 +183,7 @@ const BookForm = () => {
       );
 
       localStorage.removeItem("token");
-      navigate("/login");
+      navigate("/");
     } catch (err) {
       console.error("Error logging out:", err);
       setMessage("Failed to log out. Please try again.");
@@ -213,15 +213,16 @@ const BookForm = () => {
         <Container>
           <Navbar.Brand href="#">Book Store</Navbar.Brand>
           <Nav className="ml-auto">
-            <Nav.Link href="/login">Login</Nav.Link>
-            <Nav.Link href="/">Register</Nav.Link>
+            <Nav.Link href="/">Login</Nav.Link>
+            <Nav.Link href="/register">Register</Nav.Link>
             <Button
               onClick={handleLogout}
               variant="danger"
               className="ml-2"
               disabled={loggingOut} // Disable button if logging out
             >
-              {loading ? "Logging out..." : "Logout"}
+              {loggingOut ? "Logging out..." : "Logout"}
+              {/* Update button text */}
             </Button>
           </Nav>
         </Container>

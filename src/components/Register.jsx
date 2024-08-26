@@ -27,7 +27,7 @@ const RegisterPage = () => {
 
     try {
       await axios.post(`${API_URL}/api/v1/auth/register`, { email, password });
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       if (
         error.response &&
@@ -44,7 +44,7 @@ const RegisterPage = () => {
   };
 
   const handleLogin = () => {
-    navigate("/login");
+    navigate("/");
   };
 
   return (
