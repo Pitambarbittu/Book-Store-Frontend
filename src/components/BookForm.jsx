@@ -25,6 +25,7 @@ const BookForm = () => {
   const [error, setError] = useState(false);
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null); // State to track which book is being deleted
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -77,12 +78,6 @@ const BookForm = () => {
     try {
       const token = localStorage.getItem("token");
 
-      // if (!token) {
-      //   setMessage("Unauthorized. Please log in again.");
-      //   setError(true);
-      //   return;
-      // }
-
       if (!token) {
         setMessage("Unauthorized. Please log in again.");
         setError(true);
@@ -127,15 +122,16 @@ const BookForm = () => {
   };
 
   const handleDelete = async (id) => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setMessage("Unauthorized. Please log in.");
-      setError(true);
-      return;
-    }
-
+    setDeletingId(id); // Set the deleting book ID
     try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setMessage("Unauthorized. Please log in.");
+        setError(true);
+        return;
+      }
+
       const response = await axios.delete(`${API_URL}/api/v1/books/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -156,6 +152,8 @@ const BookForm = () => {
       setSuccess(false);
       setMessage("Failed to delete book. Please try again.");
       setError(true);
+    } finally {
+      setDeletingId(null); // Reset the deleting book ID
     }
   };
 
@@ -213,8 +211,13 @@ const BookForm = () => {
           <Nav className="ml-auto">
             <Nav.Link href="/login">Login</Nav.Link>
             <Nav.Link href="/">Register</Nav.Link>
-            <Button onClick={handleLogout} variant="danger" className="ml-2">
-              Logout
+            <Button
+              onClick={handleLogout}
+              variant="danger"
+              className="ml-2"
+              disabled={!!loading} // Disable button if logging out
+            >
+              {loading ? "Logging out..." : "Logout"}
             </Button>
           </Nav>
         </Container>
@@ -304,8 +307,21 @@ const BookForm = () => {
                       <Button
                         variant="danger"
                         onClick={() => handleDelete(book._id)}
+                        disabled={deletingId === book._id} // Disable button if the book is being deleted
                       >
-                        Delete
+                        {deletingId === book._id ? (
+                          <span>
+                            <Spinner
+                              animation="border"
+                              variant="light"
+                              size="sm"
+                              className="mr-2"
+                            />
+                            Deleting...
+                          </span>
+                        ) : (
+                          "Delete"
+                        )}
                       </Button>
                     </td>
                   </tr>

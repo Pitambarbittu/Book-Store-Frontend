@@ -21,6 +21,8 @@ const BookList = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null); // State to track which book is being deleted
+  const [loggingOut, setLoggingOut] = useState(false); // State to track logging out status
   const navigate = useNavigate();
 
   const fetchBooks = async () => {
@@ -29,9 +31,12 @@ const BookList = () => {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        setMessage("Unauthorized. Please log in.");
+        setMessage("Unauthorized. Please log in again.");
         setError(true);
-        setLoading(false);
+        setTimeout(() => {
+          localStorage.removeItem("token");
+          navigate("/login");
+        }, 1000); // Refresh after 1 second and redirect to the login page
         return;
       }
 
@@ -64,6 +69,7 @@ const BookList = () => {
   }, []);
 
   const handleDelete = async (id) => {
+    setDeletingId(id); // Set the deleting book ID
     try {
       const token = localStorage.getItem("token");
 
@@ -93,10 +99,13 @@ const BookList = () => {
       setSuccess(false);
       setMessage("Failed to delete book. Please try again.");
       setError(true);
+    } finally {
+      setDeletingId(null); // Reset the deleting book ID
     }
   };
 
   const handleLogout = async () => {
+    setLoggingOut(true); // Set logging out status
     try {
       const token = localStorage.getItem("token");
 
@@ -121,6 +130,8 @@ const BookList = () => {
       console.error("Error logging out:", err);
       setMessage("Failed to log out. Please try again.");
       setError(true);
+    } finally {
+      setLoggingOut(false); // Reset logging out status
     }
   };
 
@@ -137,8 +148,13 @@ const BookList = () => {
           <Nav className="ml-auto">
             <Nav.Link href="/login">Login</Nav.Link>
             <Nav.Link href="/">Register</Nav.Link>
-            <Button onClick={handleLogout} variant="danger" className="ml-2">
-              Logout
+            <Button
+              onClick={handleLogout}
+              variant="danger"
+              className="ml-2"
+              disabled={loggingOut} // Disable button if logging out
+            >
+              {loggingOut ? "Logging out..." : "Logout"} {/* Update button text */}
             </Button>
           </Nav>
         </Container>
@@ -181,8 +197,9 @@ const BookList = () => {
                       <Button
                         variant="danger"
                         onClick={() => handleDelete(book._id)}
+                        disabled={deletingId === book._id} // Disable button if this book is being deleted
                       >
-                        Delete
+                        {deletingId === book._id ? "Deleting..." : "Delete"}
                       </Button>
                     </td>
                   </tr>
